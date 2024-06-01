@@ -1,7 +1,9 @@
-import styled from "styled-components";
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const StyledLogo = styled.div`
   text-align: center;
+  cursor: pointer;
 `;
 
 const Img = styled.img`
@@ -10,9 +12,10 @@ const Img = styled.img`
 `;
 
 function Logo() {
+  const navigate = useNavigate();
   return (
-    <StyledLogo>
-      <Img src="/logo-light.png" alt="Logo" />
+    <StyledLogo onClick={() => navigate('dashboard')}>
+      <Img src='/logo-light.png' alt='Logo' />
     </StyledLogo>
   );
 }

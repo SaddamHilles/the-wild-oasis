@@ -1,86 +1,123 @@
-import styled from "styled-components";
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
+import Input from '../../ui/Input';
+import Form from '../../ui/Form';
+import Button from '../../ui/Button';
+import { FileInput } from '../../ui/FileInput';
+import Textarea from '../../ui/Textarea';
+import { yupResolver } from '@hookform/resolvers/yup';
+import type { FormCabin } from '../../utils/types.t';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { createCabin } from '../../services/apiCabins';
+import toast from 'react-hot-toast';
+import FormRow from '../../ui/FormRow';
 
-import Input from "../../ui/Input";
-import Form from "../../ui/Form";
-import Button from "../../ui/Button";
-import FileInput from "../../ui/FileInput";
-import Textarea from "../../ui/Textarea";
-
-const FormRow = styled.div`
-  display: grid;
-  align-items: center;
-  grid-template-columns: 24rem 1fr 1.2fr;
-  gap: 2.4rem;
-
-  padding: 1.2rem 0;
-
-  &:first-child {
-    padding-top: 0;
-  }
-
-  &:last-child {
-    padding-bottom: 0;
-  }
-
-  &:not(:last-child) {
-    border-bottom: 1px solid var(--color-grey-100);
-  }
-
-  &:has(button) {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1.2rem;
-  }
-`;
-
-const Label = styled.label`
-  font-weight: 500;
-`;
-
-const Error = styled.span`
-  font-size: 1.4rem;
-  color: var(--color-red-700);
-`;
+const cabinSchema = yup.object().shape({
+  name: yup
+    .string()
+    .required('Name is required Filed')
+    .min(2, 'At least 2 letters')
+    .max(50, 'at most 250 letters'),
+  maxCapacity: yup.number().required('Max capacity is required Filed'),
+  regularPrice: yup.number().required('Regular price is required Filed'),
+  discount: yup.number().required('discount is required Filed'),
+  description: yup
+    .string()
+    .required('Description is required Filed')
+    .min(10)
+    .max(250),
+  image: yup.string().required(),
+});
 
 function CreateCabinForm() {
+  const queryClient = useQueryClient();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormCabin>({
+    resolver: yupResolver(cabinSchema),
+  });
+  const { mutate, isPending } = useMutation({
+    mutationFn: createCabin,
+    onSuccess: () => {
+      toast.success('New cabin successfully created');
+      queryClient.invalidateQueries({ queryKey: ['cabins'] });
+      reset();
+    },
+    onError: err => {
+      toast.error(err.message);
+    },
+  });
+
+  function onSubmitHandler(data: FormCabin) {
+    console.log('data: ', data);
+    return;
+    mutate(data);
+  }
   return (
-    <Form>
-      <FormRow>
-        <Label htmlFor="name">Cabin name</Label>
-        <Input type="text" id="name" />
+    <Form type='modal' onSubmit={handleSubmit(onSubmitHandler)}>
+      <FormRow label='Cabin name' error={errors.name?.message}>
+        <Input
+          type='text'
+          id='name'
+          {...register('name')}
+          disabled={isPending}
+        />
       </FormRow>
-
-      <FormRow>
-        <Label htmlFor="maxCapacity">Maximum capacity</Label>
-        <Input type="number" id="maxCapacity" />
+      <FormRow label='Maximum capacity' error={errors.maxCapacity?.message}>
+        <Input
+          type='number'
+          id='maxCapacity'
+          {...register('maxCapacity')}
+          disabled={isPending}
+        />
       </FormRow>
-
-      <FormRow>
-        <Label htmlFor="regularPrice">Regular price</Label>
-        <Input type="number" id="regularPrice" />
+      <FormRow label='Regular price' error={errors.regularPrice?.message}>
+        <Input
+          type='number'
+          id='regularPrice'
+          {...register('regularPrice')}
+          disabled={isPending}
+        />
       </FormRow>
-
-      <FormRow>
-        <Label htmlFor="discount">Discount</Label>
-        <Input type="number" id="discount" defaultValue={0} />
+      <FormRow label='Discount' error={errors.discount?.message}>
+        <Input
+          type='number'
+          id='discount'
+          defaultValue={0}
+          {...register('discount')}
+          disabled={isPending}
+        />
       </FormRow>
-
-      <FormRow>
-        <Label htmlFor="description">Description for website</Label>
-        <Textarea type="number" id="description" defaultValue="" />
+      <FormRow
+        label='Description for website'
+        error={errors.description?.message}
+      >
+        <Textarea
+          id='description'
+          defaultValue=''
+          {...register('description')}
+          disabled={isPending}
+        />
       </FormRow>
-
-      <FormRow>
-        <Label htmlFor="image">Cabin photo</Label>
-        <FileInput id="image" accept="image/*" />
+      <FormRow label='Cabin photo' error={errors.image?.message}>
+        <FileInput
+          id='image'
+          accept='image/*'
+          {...register('image')}
+          disabled={isPending}
+        />
       </FormRow>
-
       <FormRow>
         {/* type is an HTML attribute! */}
-        <Button variation="secondary" type="reset">
+        <Button variation='secondary' type='reset'>
           Cancel
         </Button>
-        <Button>Edit cabin</Button>
+        <Button disabled={isPending}>
+          {isPending ? 'Creating...' : 'Add cabin'}
+        </Button>
       </FormRow>
     </Form>
   );
