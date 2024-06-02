@@ -33,5 +33,5 @@ export type FormCabin = {
   regularPrice: number;
   discount: number;
   description: string;
-  image: string;
+  image: any;
 };

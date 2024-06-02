@@ -26,7 +26,7 @@ const cabinSchema = yup.object().shape({
     .required('Description is required Filed')
     .min(10)
     .max(250),
-  image: yup.string().required(),
+  image: yup.mixed().required('Cabin photo is required'),
 });
 
 function CreateCabinForm() {
@@ -52,9 +52,8 @@ function CreateCabinForm() {
   });
 
   function onSubmitHandler(data: FormCabin) {
-    console.log('data: ', data);
-    return;
-    mutate(data);
+    console.log(data.image[0].name);
+    mutate({ ...data, image: data.image[0] });
   }
   return (
     <Form type='modal' onSubmit={handleSubmit(onSubmitHandler)}>
@@ -102,7 +101,7 @@ function CreateCabinForm() {
           disabled={isPending}
         />
       </FormRow>
-      <FormRow label='Cabin photo' error={errors.image?.message}>
+      <FormRow label='Cabin photo' error={errors.image?.message + 'SDM'}>
         <FileInput
           id='image'
           accept='image/*'
