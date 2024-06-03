@@ -7,7 +7,7 @@ import Textarea from '../../ui/Textarea';
 import type { CabinType, FormCabin } from '../../utils/types.t';
 import FormRow from '../../ui/FormRow';
 import useCreateCabin from '../../hooks/cabin/useCreateCabin';
-import useEditCabin from '../../hooks/cabin/useEditCabin';
+import useEditCabin from '../../hooks/cabin/useUpdateCabin';
 
 // const cabinSchema = yup.object().shape({
 //   name: yup

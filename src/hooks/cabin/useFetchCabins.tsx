@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { CabinType, Nullable } from '../../utils/types.t';
+import { CabinType, Nullable, QueryKeys } from '../../utils/types.t';
 import { getCabins } from '../../services/apiCabins';
 
 function useFetchCabins() {
@@ -8,7 +8,7 @@ function useFetchCabins() {
     isPending,
     error,
   } = useQuery<Nullable<CabinType[]>>({
-    queryKey: ['cabins'],
+    queryKey: [QueryKeys.cabins],
     queryFn: getCabins,
   });
 
