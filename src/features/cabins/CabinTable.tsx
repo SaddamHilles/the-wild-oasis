@@ -1,9 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
-import { getCabins } from '../../services/apiCabins';
 import Spinner from '../../ui/Spinner';
 import CabinRow from './CabinRow';
-import type { CabinType, Nullable } from '../../utils/types.t';
+import useFetchCabins from '../../hooks/cabin/useFetchCabins';
 
 const Table = styled.div`
   border: 1px solid var(--color-grey-200);
@@ -30,14 +28,7 @@ const TableHeader = styled.header`
 `;
 
 function CabinTable() {
-  const {
-    data: cabins,
-    isPending,
-    error,
-  } = useQuery<Nullable<CabinType[]>>({
-    queryKey: ['cabins'],
-    queryFn: getCabins,
-  });
+  const { cabins, isPending } = useFetchCabins();
 
   if (isPending) return <Spinner />;
   return (
